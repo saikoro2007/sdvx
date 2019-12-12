@@ -123,7 +123,7 @@ export default {
     },
     async callApi (playerName) {
       let response = {}
-      await axios.get(`https://nearnoah.net/api/showUserData.json?username=${playerName}`)
+      await axios.get(`/api/showUserData.json?username=${playerName}`)
         .then(res => {
           if (res.data.profile) {
             response = res.data.profile.tracks

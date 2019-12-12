@@ -7,6 +7,12 @@ module.exports = {
     port: 8888,
     host: "0.0.0.0",
     disableHostCheck: true,
+    proxy: {
+      "/api/": {
+        target: 'https://nearnoah.net/',
+        changeOrigin: true,
+      }
+    }
   },
   transpileDependencies: [
     "vuetify"
