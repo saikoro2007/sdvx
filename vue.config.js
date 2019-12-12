@@ -9,7 +9,8 @@ module.exports = {
     disableHostCheck: true,
     proxy: {
       "/api/": {
-        target: "https://nearnoah.net/",
+        target: 'https://nearnoah.net/',
+        changeOrigin: true,
       }
     }
   },
