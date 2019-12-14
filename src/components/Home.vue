@@ -118,8 +118,13 @@ export default {
 
   methods: {
     async action () {
-      this.playerData1 = await this.callApi(this.playerName1)
-      this.playerData2 = await this.callApi(this.playerName2)
+      Promise.all([
+        this.callApi(this.playerName1),
+        this.callApi(this.playerName2)
+      ]).then(result => {
+        this.playerData1 = result[0]
+        this.playerData2 = result[1]
+      })
     },
     async callApi (playerName) {
       let response = {}
