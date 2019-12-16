@@ -59,8 +59,9 @@
 </style>
 
 <script>
+//import _ from 'lodash'
 export default {
-	props: ['score'],
+	props: ['score', 'temp'],
 	data: () => ({
     expanded: [],
     search: '',

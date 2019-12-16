@@ -42,12 +42,14 @@
     <score-table
       v-if="this.playerData1.length > 0"
       :score="playerData1"
+      :temp="temp"
     ></score-table>
   </v-container>
 </template>
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 import ScoreTable from './ScoreTable.vue'
 
 export default {
@@ -61,6 +63,7 @@ export default {
     playerName2: '',
     playerData1: {},
     playerData2: {},
+    temp: {},
   }),
 
   methods: {
@@ -69,6 +72,7 @@ export default {
         this.callApi(this.playerName1),
         this.callApi(this.playerName2)
       ]).then(result => {
+        this.temp = this.hoge(result[0])
         this.playerData1 = result[0]
         this.playerData2 = result[1]
       })
@@ -84,6 +88,16 @@ export default {
       // TODO: 取得できなかったときのハンドリング
       return response
     },
+    // 絶対もっとどうにかなるけどJSむずかしい
+    hoge: scoreData => {
+			return _(scoreData).map(item => {
+				const title = item.title
+				const id = item.id
+				return _(item).omit(['title', 'id']).map((score, difficulty) => {
+					return _.assign({title: title, id: id, difficulty: difficulty}, score)
+				}).value()
+			}).flatten().value()
+    }
   }
   
 }
