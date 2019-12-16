@@ -51,6 +51,7 @@
 import axios from 'axios'
 import _ from 'lodash'
 import ScoreTable from './ScoreTable.vue'
+import json from '../../assets/score.json'
 
 export default {
   name: 'Home',
@@ -64,6 +65,7 @@ export default {
     playerData1: {},
     playerData2: {},
     temp: {},
+    isProduction: false,
   }),
 
   methods: {
@@ -79,13 +81,19 @@ export default {
     },
     async callApi (playerName) {
       let response = {}
-      await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
-        .then(res => {
-          if (res.data.profile) {
-            response = res.data.profile.tracks
-          }
-        })
-      // TODO: 取得できなかったときのハンドリング
+      if (this.isProduction) {
+        await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
+          .then(res => {
+            console.log(this.readJson())
+            if (res.data.profile) {
+              response = res.data.profile.tracks
+            }
+          })
+        // TODO: 取得できなかったときのハンドリング
+      } else {
+        let res = json
+        response = res.data.profile.tracks
+      }
       return response
     },
     // 絶対もっとどうにかなるけどJSむずかしい
@@ -94,7 +102,7 @@ export default {
 				const title = item.title
 				const id = item.id
 				return _(item).omit(['title', 'id']).map((score, difficulty) => {
-					return _.assign({title: title, id: id, difficulty: difficulty}, score)
+					return _.assign({title: title, musicId: id, difficulty: difficulty}, score)
 				}).value()
 			}).flatten().value()
     }
