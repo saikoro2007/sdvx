@@ -21,7 +21,9 @@ export default {
     headers: [
       { text: 'title', value: 'title' },
       { text: 'level', value: 'level' },
-      { text: 'difficulty', value: 'difficulty' },
+			{ text: 'difficulty', value: 'difficulty' },
+			{ text: 'clearlamp', value: 'clearlamp' },
+			{ text: 'grade', value: 'grade' },
       { text: 'score', value: 'score' },
     ],
 	}),
