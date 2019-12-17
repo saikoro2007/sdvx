@@ -2,7 +2,7 @@
 	<v-container>
 		<v-data-table
 			:headers="headers"
-			:items="this.temp"
+			:items="filteredItems"
 			:items-per-page="100"
 		>
 		</v-data-table>
@@ -13,9 +13,9 @@
 </style>
 
 <script>
-//import _ from 'lodash'
+import _ from 'lodash'
 export default {
-	props: ['score', 'temp'],
+	props: ['score', 'temp', 'levelFilter'],
 	data: () => ({
     search: '',
     headers: [
@@ -27,5 +27,14 @@ export default {
       { text: 'score', value: 'score' },
     ],
 	}),
+	computed: {
+		filteredItems: function () {
+			if (!this.levelFilter) {
+				return this.temp
+			}
+			// クソ実装した ぜったいもっとなんかある
+			return _(this.temp).filter(score => _.includes(this.levelFilter, String(score.level))).value()
+		},
+	}
 }
 </script>

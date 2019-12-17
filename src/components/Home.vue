@@ -39,10 +39,12 @@
         </v-row>
       </v-container>
     </v-form>
+    <hoge-filter @updateFilter="updateFilter"></hoge-filter>
     <score-table
       v-if="this.playerData1.length > 0"
       :score="playerData1"
       :temp="temp"
+      :levelFilter="levelFilter"
     ></score-table>
   </v-container>
 </template>
@@ -51,12 +53,14 @@
 import axios from 'axios'
 import _ from 'lodash'
 import ScoreTable from './ScoreTable.vue'
+import Filter from './Filter.vue'
 import json from '../../assets/score.json'
 
 export default {
   name: 'Home',
   components: {
-    ScoreTable: ScoreTable
+    ScoreTable: ScoreTable,
+    hogeFilter: Filter
   },
 
   data: () => ({
@@ -65,7 +69,9 @@ export default {
     playerData1: {},
     playerData2: {},
     temp: {},
+    selected: ['fuga'],
     isProduction: false,
+		levelFilter: [],
   }),
 
   methods: {
@@ -105,7 +111,10 @@ export default {
 					return _.assign({title: title, musicId: id, difficulty: difficulty}, score)
 				}).value()
 			}).flatten().value()
-    }
+    },
+		updateFilter (filter) {
+      this.levelFilter = filter
+		}
   }
   
 }
