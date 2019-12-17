@@ -41,8 +41,8 @@
     </v-form>
     <level-filter @updateFilter="updateFilter"></level-filter>
     <score-table
-      v-if="this.playerData1.length > 0"
-      :score="playerData1"
+      v-if="hasData"
+      :score="tmp"
       :rivalScore="playerData2"
       :levelFilter="levelFilter"
     ></score-table>
@@ -68,10 +68,17 @@ export default {
     playerName2: '',
     playerData1: {},
     playerData2: {},
-    isProduction: false,
+    tmp: [],
+    isProduction: true,
 		levelFilter: [],
   }),
 
+  computed: {
+    hasData () {
+      console.log(_.isEmpty(this.playerData1))
+      return !_.isEmpty(this.playerData1)
+    }
+  },
   methods: {
     async action () {
       Promise.all([
@@ -80,6 +87,7 @@ export default {
       ]).then(result => {
         this.playerData1 = this.formatScore(result[0])
         this.playerData2 = this.formatScore(result[1])
+        this.tmp = this.hoge(this.playerData1)
       })
     },
     async callApi (playerName) {
@@ -104,13 +112,19 @@ export default {
 				const title = item.title
 				const id = item.id
 				return _(item).omit(['title', 'id']).map((score, difficulty) => {
-					return _.assign({title: title, musicId: id, difficulty: difficulty}, score)
+					return _.assign({id: `${id}_${difficulty}`, title: title, musicId: id, difficulty: difficulty}, score)
 				}).value()
-			}).flatten().value()
+      }).flatten().mapKeys(v => v.id).value()
     },
 		updateFilter (filter) {
       this.levelFilter = filter
-		}
+    },
+    hoge () {
+      return _(this.playerData1).map((score, id) => {
+        const rival = this.playerData2[id]
+        return _.assign({rivalScore: rival.score, diff: score.score - rival.score}, score)
+      }).value()
+    }
   }
 }
 </script>

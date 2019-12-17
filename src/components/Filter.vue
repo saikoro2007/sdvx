@@ -2,12 +2,13 @@
 	<v-container>
       <p>{{ selected }}</p>
       <v-row>
-        <v-checkbox v-model="checked" label="Lv15" value="15"></v-checkbox>
-        <v-checkbox v-model="checked" label="Lv16" value="16"></v-checkbox>
-        <v-checkbox v-model="checked" label="Lv17" value="17"></v-checkbox>
-        <v-checkbox v-model="checked" label="Lv18" value="18"></v-checkbox>
-        <v-checkbox v-model="checked" label="Lv19" value="19"></v-checkbox>
-        <v-checkbox v-model="checked" label="Lv20" value="20"></v-checkbox>
+        <v-checkbox
+          v-for="box in lvCheckboxes"
+          :key="box.value"
+          v-model="checked"
+          :label="box.label"
+          :value="box.value"
+        ></v-checkbox>
       </v-row>
 	</v-container>
 </template>
@@ -29,6 +30,16 @@ export default {
         this.$emit('updateFilter', this.selected)
       },
     },
+    lvCheckboxes: () => {
+      return [
+        {label: 'Lv15', value: 15},
+        {label: 'Lv16', value: 16},
+        {label: 'Lv17', value: 17},
+        {label: 'Lv18', value: 18},
+        {label: 'Lv19', value: 19},
+        {label: 'Lv20', value: 20},
+      ]
+    }
   },
   methods: {
     onChange: event => {

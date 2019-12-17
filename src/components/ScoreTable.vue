@@ -19,21 +19,28 @@ export default {
 	data: () => ({
     search: '',
     headers: [
-      { text: 'title', value: 'title' },
-      { text: 'level', value: 'level' },
+			{ text: 'title', value: 'title' },
+			{ text: 'level', value: 'level' },
 			{ text: 'difficulty', value: 'difficulty' },
 			{ text: 'clearlamp', value: 'clearlamp' },
 			{ text: 'grade', value: 'grade' },
-      { text: 'score', value: 'score' },
+			{ text: 'score', value: 'score' },
+			{ text: 'rival', value: 'rivalScore' },
+			{ text: 'diff', value: 'diff' },
     ],
 	}),
 	computed: {
 		filteredItems: function () {
+			let hoge
 			if (!this.levelFilter.length) {
-				return this.score
-			}
+				hoge = _.values(this.score)
+			} else {
 			// TODO: v-data-tableのfilter機能を使う
-			return _(this.score).filter(score => _.includes(this.levelFilter, String(score.level))).value()
+				hoge = _(this.score).filter(score => _.includes(this.levelFilter, score.level)).values().value()
+			}
+			console.log(hoge)
+			// とりあえずスコア差ある曲だけ表示
+			return _(hoge).filter((uni) => uni.diff).value()
 		},
 	}
 }
