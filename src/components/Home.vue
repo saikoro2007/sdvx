@@ -39,11 +39,11 @@
         </v-row>
       </v-container>
     </v-form>
-    <hoge-filter @updateFilter="updateFilter"></hoge-filter>
+    <level-filter @updateFilter="updateFilter"></level-filter>
     <score-table
       v-if="this.playerData1.length > 0"
       :score="playerData1"
-      :temp="temp"
+      :rivalScore="playerData2"
       :levelFilter="levelFilter"
     ></score-table>
   </v-container>
@@ -60,7 +60,7 @@ export default {
   name: 'Home',
   components: {
     ScoreTable: ScoreTable,
-    hogeFilter: Filter
+    LevelFilter: Filter
   },
 
   data: () => ({
@@ -68,8 +68,6 @@ export default {
     playerName2: '',
     playerData1: {},
     playerData2: {},
-    temp: {},
-    selected: ['fuga'],
     isProduction: false,
 		levelFilter: [],
   }),
@@ -80,9 +78,8 @@ export default {
         this.callApi(this.playerName1),
         this.callApi(this.playerName2)
       ]).then(result => {
-        this.temp = this.hoge(result[0])
-        this.playerData1 = result[0]
-        this.playerData2 = result[1]
+        this.playerData1 = this.formatScore(result[0])
+        this.playerData2 = this.formatScore(result[1])
       })
     },
     async callApi (playerName) {
@@ -90,7 +87,6 @@ export default {
       if (this.isProduction) {
         await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
           .then(res => {
-            console.log(this.readJson())
             if (res.data.profile) {
               response = res.data.profile.tracks
             }
@@ -103,7 +99,7 @@ export default {
       return response
     },
     // 絶対もっとどうにかなるけどJSむずかしい
-    hoge: scoreData => {
+    formatScore: scoreData => {
 			return _(scoreData).map(item => {
 				const title = item.title
 				const id = item.id
@@ -116,6 +112,5 @@ export default {
       this.levelFilter = filter
 		}
   }
-  
 }
 </script>

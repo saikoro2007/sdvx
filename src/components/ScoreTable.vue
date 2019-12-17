@@ -15,7 +15,7 @@
 <script>
 import _ from 'lodash'
 export default {
-	props: ['score', 'temp', 'levelFilter'],
+	props: ['score', 'rivalScore', 'levelFilter'],
 	data: () => ({
     search: '',
     headers: [
@@ -29,11 +29,11 @@ export default {
 	}),
 	computed: {
 		filteredItems: function () {
-			if (!this.levelFilter) {
-				return this.temp
+			if (!this.levelFilter.length) {
+				return this.score
 			}
-			// クソ実装した ぜったいもっとなんかある
-			return _(this.temp).filter(score => _.includes(this.levelFilter, String(score.level))).value()
+			// TODO: v-data-tableのfilter機能を使う
+			return _(this.score).filter(score => _.includes(this.levelFilter, String(score.level))).value()
 		},
 	}
 }
