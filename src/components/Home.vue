@@ -55,6 +55,7 @@ import _ from 'lodash'
 import ScoreTable from './ScoreTable.vue'
 import Filter from './Filter.vue'
 import json from '../../assets/score.json'
+import rivalJson from '../../assets/rival_score.json'
 
 export default {
   name: 'Home',
@@ -69,41 +70,41 @@ export default {
     playerData1: {},
     playerData2: {},
     tmp: [],
-    isProduction: true,
+    isProduction: false,
 		levelFilter: [],
   }),
 
   computed: {
     hasData () {
-      console.log(_.isEmpty(this.playerData1))
       return !_.isEmpty(this.playerData1)
     }
   },
   methods: {
     async action () {
-      Promise.all([
-        this.callApi(this.playerName1),
-        this.callApi(this.playerName2)
-      ]).then(result => {
-        this.playerData1 = this.formatScore(result[0])
-        this.playerData2 = this.formatScore(result[1])
+      if (this.isProduction) {
+        Promise.all([
+          this.callApi(this.playerName1),
+          this.callApi(this.playerName2)
+        ]).then(result => {
+          this.playerData1 = this.formatScore(result[0])
+          this.playerData2 = this.formatScore(result[1])
+          this.tmp = this.hoge(this.playerData1)
+        })
+      } else {
+        this.playerData1 = this.formatScore(json)
+        this.playerData2 = this.formatScore(rivalJson)
         this.tmp = this.hoge(this.playerData1)
-      })
+      }
     },
     async callApi (playerName) {
       let response = {}
-      if (this.isProduction) {
-        await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
-          .then(res => {
-            if (res.data.profile) {
-              response = res.data.profile.tracks
-            }
-          })
-        // TODO: 取得できなかったときのハンドリング
-      } else {
-        let res = json
-        response = res.data.profile.tracks
-      }
+      await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
+        .then(res => {
+          if (res.data.profile) {
+            response = res.data.profile.tracks
+          }
+        })
+      // TODO: 取得できなかったときのハンドリング
       return response
     },
     // 絶対もっとどうにかなるけどJSむずかしい
