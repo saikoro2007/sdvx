@@ -79,6 +79,15 @@ export default {
       return !_.isEmpty(this.playerData1)
     }
   },
+  async created () {
+    if (this.$route.params.name) {
+      // ページにアクセスして遅いの嫌だからSSRにしたい感
+      this.playerName1 = this.$route.params.name
+      console.log(this.playerName1)
+      this.playerData1 = this.formatScore(await this.callApi(this.playerName1))
+      console.log(this.playerData1)
+    }
+  },
   methods: {
     async action () {
       if (this.isProduction) {
@@ -88,12 +97,12 @@ export default {
         ]).then(result => {
           this.playerData1 = this.formatScore(result[0])
           this.playerData2 = this.formatScore(result[1])
-          this.tmp = this.hoge(this.playerData1)
+          this.tmp = this.hoge(this.playerData1, this.playerData2)
         })
       } else {
         this.playerData1 = this.formatScore(json)
         this.playerData2 = this.formatScore(rivalJson)
-        this.tmp = this.hoge(this.playerData1)
+        this.tmp = this.hoge(this.playerData1, this.playerData2)
       }
     },
     async callApi (playerName) {
@@ -107,6 +116,7 @@ export default {
       // TODO: 取得できなかったときのハンドリング
       return response
     },
+    // {id_(難易度): {スコア等}....} の形に変換する
     // 絶対もっとどうにかなるけどJSむずかしい
     formatScore: scoreData => {
 			return _(scoreData).map(item => {
@@ -120,9 +130,10 @@ export default {
 		updateFilter (filter) {
       this.levelFilter = filter
     },
-    hoge () {
-      return _(this.playerData1).map((score, id) => {
-        const rival = this.playerData2[id]
+    // ライバルのスコアと比較して譜面ごとの差分要素を追加する
+    hoge (hoge, rivalScores) {
+      return _(hoge).map((score, id) => {
+        const rival = rivalScores[id]
         return _.assign({rivalScore: rival.score, diff: score.score - rival.score}, score)
       }).value()
     }
