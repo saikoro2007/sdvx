@@ -70,7 +70,7 @@ export default {
     playerData1: {},
     playerData2: {},
     tmp: [],
-    isProduction: false,
+    isProduction: true,
 		levelFilter: [],
   }),
 
@@ -97,12 +97,12 @@ export default {
         ]).then(result => {
           this.playerData1 = this.formatScore(result[0])
           this.playerData2 = this.formatScore(result[1])
-          this.tmp = this.hoge(this.playerData1, this.playerData2)
+          this.tmp = this.setRivelScore(this.playerData1, this.playerData2)
         })
       } else {
         this.playerData1 = this.formatScore(json)
         this.playerData2 = this.formatScore(rivalJson)
-        this.tmp = this.hoge(this.playerData1, this.playerData2)
+        this.tmp = this.setRivelScore(this.playerData1, this.playerData2)
       }
     },
     async callApi (playerName) {
@@ -131,7 +131,7 @@ export default {
       this.levelFilter = filter
     },
     // ライバルのスコアと比較して譜面ごとの差分要素を追加する
-    hoge (hoge, rivalScores) {
+    setRivelScore (hoge, rivalScores) {
       return _(hoge).map((score, id) => {
         const rival = rivalScores[id]
         return _.assign({rivalScore: rival.score, diff: score.score - rival.score}, score)
