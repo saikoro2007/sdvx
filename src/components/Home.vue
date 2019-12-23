@@ -42,8 +42,10 @@
     <level-filter @updateFilter="updateFilter"></level-filter>
     <score-table
       v-if="hasData"
-      :score="tmp"
+      :playerScore="playerData1"
+      :playerName="playerName1"
       :rivalScore="playerData2"
+      :rivalName="playerName2"
       :levelFilter="levelFilter"
     ></score-table>
   </v-container>
@@ -69,7 +71,7 @@ export default {
     playerName2: '',
     playerData1: {},
     playerData2: {},
-    tmp: [],
+    data: [],
     isProduction: true,
 		levelFilter: [],
   }),
@@ -83,26 +85,29 @@ export default {
     if (this.$route.params.name) {
       // ページにアクセスして遅いの嫌だからSSRにしたい感
       this.playerName1 = this.$route.params.name
-      console.log(this.playerName1)
       this.playerData1 = this.formatScore(await this.callApi(this.playerName1))
-      console.log(this.playerData1)
     }
   },
   methods: {
     async action () {
       if (this.isProduction) {
-        Promise.all([
-          this.callApi(this.playerName1),
-          this.callApi(this.playerName2)
-        ]).then(result => {
-          this.playerData1 = this.formatScore(result[0])
-          this.playerData2 = this.formatScore(result[1])
-          this.tmp = this.setRivelScore(this.playerData1, this.playerData2)
-        })
+        if (Object.keys(this.playerData1).length) {
+          this.playerData2 = this.formatScore(await this.callApi(this.playerName2))
+          this.data = this.setRivelScore(this.playerData1, this.playerData2)
+        } else {
+          Promise.all([
+            this.callApi(this.playerName1),
+            this.callApi(this.playerName2)
+          ]).then(result => {
+            this.playerData1 = this.formatScore(result[0])
+            this.playerData2 = this.formatScore(result[1])
+            this.data = this.setRivelScore(this.playerData1, this.playerData2)
+          })
+        }
       } else {
         this.playerData1 = this.formatScore(json)
         this.playerData2 = this.formatScore(rivalJson)
-        this.tmp = this.setRivelScore(this.playerData1, this.playerData2)
+        this.data = this.setRivelScore(this.playerData1, this.playerData2)
       }
     },
     async callApi (playerName) {
@@ -123,7 +128,7 @@ export default {
 				const title = item.title
 				const id = item.id
 				return _(item).omit(['title', 'id']).map((score, difficulty) => {
-					return _.assign({id: `${id}_${difficulty}`, title: title, musicId: id, difficulty: difficulty}, score)
+          return {...score, id: `${id}_${difficulty}`, title: title, musicId: id, difficulty: difficulty}
 				}).value()
       }).flatten().mapKeys(v => v.id).value()
     },
@@ -134,7 +139,7 @@ export default {
     setRivelScore (hoge, rivalScores) {
       return _(hoge).map((score, id) => {
         const rival = rivalScores[id]
-        return _.assign({rivalScore: rival.score, diff: score.score - rival.score}, score)
+        return {...score, rivalScore: rival.score, diff: score.score - rival.score}
       }).value()
     }
   }

@@ -15,19 +15,18 @@
 <script>
 import _ from 'lodash'
 export default {
-	props: ['score', 'rivalScore', 'levelFilter'],
+	props: ['playerScore', 'playerName', 'levelFilter', 'rivalScore', 'rivalName'],
 	data: () => ({
-    search: '',
-    headers: [
+		search: '',
+		defaultHeaders: [
 			{ text: 'title', value: 'title' },
 			{ text: 'level', value: 'level' },
 			{ text: 'difficulty', value: 'difficulty' },
 			{ text: 'clearlamp', value: 'clearlamp' },
 			{ text: 'grade', value: 'grade' },
-			{ text: 'score', value: 'score' },
-			{ text: 'rival', value: 'rivalScore' },
-			{ text: 'diff', value: 'diff' },
-    ],
+			// TODO: playerName表示
+			{ text: 'playerScore', value: 'score' },
+		],
 	}),
 	computed: {
 		filteredItems: function () {
@@ -38,9 +37,38 @@ export default {
 			// TODO: v-data-tableのfilter機能を使う
 				hoge = _(this.score).filter(score => _.includes(this.levelFilter, score.level)).values().value()
 			}
-			console.log(hoge)
+			
 			// とりあえずスコア差ある曲だけ表示
-			return _(hoge).filter((uni) => uni.diff).value()
+			return !this.hasRivalScore ? _(hoge).filter((uni) => uni.score).value() : _(hoge).filter((uni) => uni.diff).value()
+			//return _(hoge).filter((uni) => uni.diff).value()
+		},
+		score: function () {
+			if (!this.hasRivalScore) {
+				return this.playerScore
+			}
+			return this.setRivelScore(this.playerScore, this.rivalScore)
+		},
+		hasRivalScore: function () {
+			return Object.keys(this.rivalScore).length > 0
+		},
+		headers: function () {
+			if (!this.hasRivalScore) {
+				return this.defaultHeaders
+			} else {
+				return this.defaultHeaders.concat([
+					{text: this.rivalName, value: 'rivalScore'},
+					{text: 'diff', value: 'diff'}
+				])
+			}
+		}
+	},
+	methods: {
+    // ライバルのスコアと比較して譜面ごとの差分要素を追加する
+    setRivelScore (playerScore, rivalScore) {
+      return _(playerScore).map((score, id) => {
+        const rival = rivalScore[id]
+        return {...score, rivalScore: rival.score, diff: score.score - rival.score}
+      }).value()
 		},
 	}
 }

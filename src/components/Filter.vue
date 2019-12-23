@@ -1,15 +1,14 @@
 <template>
 	<v-container>
-      <p>{{ selected }}</p>
-      <v-row>
-        <v-checkbox
-          v-for="box in lvCheckboxes"
-          :key="box.value"
-          v-model="checked"
-          :label="box.label"
-          :value="box.value"
-        ></v-checkbox>
-      </v-row>
+    <v-row>
+      <v-checkbox
+        v-for="box in lvCheckboxes"
+        :key="box.value"
+        v-model="checked"
+        :label="box.label"
+        :value="box.value"
+      ></v-checkbox>
+    </v-row>
 	</v-container>
 </template>
 <style scoped lang="scss">
