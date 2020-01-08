@@ -39,87 +39,76 @@
         </v-row>
       </v-container>
     </v-form>
-    <v-container>
-      <v-data-table
-        v-if="this.playerData1.length > 0"
-        :headers="headers"
-        :items="this.playerData1"
-        :items-per-page="100"
-        :expanded.sync="expanded"
-        color="secondary"
-        show-expand
-        class="elevation-5"
-      >
-        <template v-slot:top>
-          <v-text-field
-            v-model="search"
-            label="Search"
-            append-icon="search"  
-          />
-        </template>
-        <template v-slot:expanded-item="{ headers, item }">
-         <td :colspan="headers.length">
-          <v-list
-            flat
-            dense
-          >
-            <v-list-item-group>
-              <v-list-item v-if="item.novice">
-                NOV(Lv.{{ item.novice.level }}): {{ item.novice.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.advanced">
-                ADV(Lv.{{ item.advanced.level }}): {{ item.advanced.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.exhaust">
-                EXH(Lv.{{ item.exhaust.level }}): {{ item.exhaust.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.maximum">
-                MXM(Lv.{{ item.maximum.level }}): {{ item.maximum.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.infinite">
-                INF(Lv.{{ item.infinite.level }}): {{ item.infinite.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.gravity">
-                GRV(Lv.{{ item.gravity.level }}): {{ item.gravity.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.heavenly">
-                HVN(Lv.{{ item.heavenly.level }}): {{ item.heavenly.score || 0 }}
-              </v-list-item>
-              <v-list-item v-if="item.vivid">
-                VVD(Lv.{{ item.vivid.level }}): {{ item.vivid.score || 0 }}
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-         </td>
-        </template>
-      </v-data-table>
-    </v-container>
+    <level-filter @updateFilter="updateFilter"></level-filter>
+    <score-table
+      v-if="hasData"
+      :playerScore="playerData1"
+      :playerName="playerName1"
+      :rivalScore="playerData2"
+      :rivalName="playerName2"
+      :levelFilter="levelFilter"
+    ></score-table>
   </v-container>
 </template>
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
+import ScoreTable from './ScoreTable.vue'
+import Filter from './Filter.vue'
+import json from '../../assets/score.json'
+import rivalJson from '../../assets/rival_score.json'
 
 export default {
   name: 'Home',
+  components: {
+    ScoreTable: ScoreTable,
+    LevelFilter: Filter
+  },
 
   data: () => ({
-    expanded: [],
     playerName1: '',
     playerName2: '',
     playerData1: {},
     playerData2: {},
-    search: '',
-    headers: [
-      { text: 'title', value: 'title' },
-      { text: '', value: 'data-table-expand' },
-    ],
+    data: [],
+    isProduction: true,
+		levelFilter: [],
   }),
 
+  computed: {
+    hasData () {
+      return !_.isEmpty(this.playerData1)
+    }
+  },
+  async created () {
+    if (this.$route.params.name) {
+      // ページにアクセスして遅いの嫌だからSSRにしたい感
+      this.playerName1 = this.$route.params.name
+      this.playerData1 = this.formatScore(await this.callApi(this.playerName1))
+    }
+  },
   methods: {
     async action () {
-      this.playerData1 = await this.callApi(this.playerName1)
-      this.playerData2 = await this.callApi(this.playerName2)
+      if (this.isProduction) {
+        if (Object.keys(this.playerData1).length) {
+          this.playerData2 = this.formatScore(await this.callApi(this.playerName2))
+          this.data = this.setRivelScore(this.playerData1, this.playerData2)
+        } else {
+          Promise.all([
+            this.callApi(this.playerName1),
+            this.callApi(this.playerName2)
+          ]).then(result => {
+            this.playerData1 = this.formatScore(result[0])
+            this.playerData2 = this.formatScore(result[1])
+            this.data = this.setRivelScore(this.playerData1, this.playerData2)
+          })
+        }
+      } else {
+        this.playerData1 = this.formatScore(json)
+        this.playerData2 = this.formatScore(rivalJson)
+        this.data = this.setRivelScore(this.playerData1, this.playerData2)
+      }
     },
     async callApi (playerName) {
       let response = {}
@@ -129,9 +118,30 @@ export default {
             response = res.data.profile.tracks
           }
         })
+      // TODO: 取得できなかったときのハンドリング
       return response
     },
+    // {id_(難易度): {スコア等}....} の形に変換する
+    // 絶対もっとどうにかなるけどJSむずかしい
+    formatScore: scoreData => {
+			return _(scoreData).map(item => {
+				const title = item.title
+				const id = item.id
+				return _(item).omit(['title', 'id']).map((score, difficulty) => {
+          return {...score, id: `${id}_${difficulty}`, title: title, musicId: id, difficulty: difficulty}
+				}).value()
+      }).flatten().mapKeys(v => v.id).value()
+    },
+		updateFilter (filter) {
+      this.levelFilter = filter
+    },
+    // ライバルのスコアと比較して譜面ごとの差分要素を追加する
+    setRivelScore (hoge, rivalScores) {
+      return _(hoge).map((score, id) => {
+        const rival = rivalScores[id]
+        return {...score, rivalScore: rival.score, diff: score.score - rival.score}
+      }).value()
+    }
   }
-  
 }
 </script>
