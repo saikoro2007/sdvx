@@ -1,5 +1,9 @@
 <template>
 	<v-container>
+		<apex-charts
+			type="pie"
+			:series="seriesTemp"
+		></apex-charts>
 		<v-data-table
 			:headers="headers"
 			:items="filteredItems"
@@ -14,7 +18,13 @@
 
 <script>
 import _ from 'lodash'
+import ApexCharts from 'apexcharts'
+
 export default {
+	name: 'ScoreTable',
+	components: {
+		ApexCharts: ApexCharts,
+	},
 	props: ['playerScore', 'playerName', 'levelFilter', 'rivalScore', 'rivalName'],
 	data: () => ({
 		search: '',
@@ -27,6 +37,8 @@ export default {
 			// TODO: playerName表示
 			{ text: 'playerScore', value: 'score' },
 		],
+		// TODO: 別のファイルに切り出す
+		grades: ['A', 'A+', 'AA', 'AA+', 'AAA', 'AAA+', 'S'],
 	}),
 	computed: {
 		filteredItems: function () {
@@ -39,7 +51,7 @@ export default {
 			}
 			
 			// とりあえずスコア差ある曲だけ表示
-			return !this.hasRivalScore ? _(hoge).filter((uni) => uni.score).value() : _(hoge).filter((uni) => uni.diff).value()
+			return !this.hasRivalScore ? _(hoge).filter((uni) => uni.score).value() : hoge//_(hoge).filter((uni) => uni.diff).value()
 			//return _(hoge).filter((uni) => uni.diff).value()
 		},
 		score: function () {
@@ -60,15 +72,25 @@ export default {
 					{text: 'diff', value: 'diff'}
 				])
 			}
-		}
+		},
+		seriesTemp: function() {
+			const hoge = _(this.filteredItems).groupBy(a => a.grade).mapValues(a => a.length).value()
+			const result = this.grades.map(t => { return hoge[t] || 0})		
+			return result
+		},
 	},
 	methods: {
     // ライバルのスコアと比較して譜面ごとの差分要素を追加する
-    setRivelScore (playerScore, rivalScore) {
-      return _(playerScore).map((score, id) => {
-        const rival = rivalScore[id]
-        return {...score, rivalScore: rival.score, diff: score.score - rival.score}
-      }).value()
+		setRivelScore (playerScore, rivalScore) {
+			return _(playerScore).map((score, id) => {
+				const rival = rivalScore[id]
+				return {...score, rivalScore: rival.score, diff: score.score - rival.score}
+			}).value()
+		},
+		hogefuga () {
+			return {
+				labels: this.grades,
+			}
 		},
 	}
 }

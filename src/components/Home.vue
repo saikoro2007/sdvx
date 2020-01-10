@@ -58,6 +58,7 @@ import ScoreTable from './ScoreTable.vue'
 import Filter from './Filter.vue'
 import json from '../../assets/score.json'
 import rivalJson from '../../assets/rival_score.json'
+//import ApexCharts from 'apexcharts'
 
 export default {
   name: 'Home',
