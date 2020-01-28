@@ -1,9 +1,12 @@
 <template>
 	<v-container>
-		<apex-charts
-			type="pie"
-			:series="seriesTemp"
-		></apex-charts>
+		<div class="chart">
+			<vue-apex-charts
+				v-if="chartOptions"
+				:options="chartOptions"
+				:series="seriesTemp"
+			></vue-apex-charts>
+		</div>
 		<v-data-table
 			:headers="headers"
 			:items="filteredItems"
@@ -14,19 +17,25 @@
 </template>
 
 <style scoped lang="scss">
+.chart {
+	float: right;
+	width: 500px;
+	height: auto;
+}
 </style>
 
 <script>
 import _ from 'lodash'
-import ApexCharts from 'apexcharts'
+import VueApexCharts from 'vue-apexcharts'
 
 export default {
 	name: 'ScoreTable',
 	components: {
-		ApexCharts: ApexCharts,
+		VueApexCharts: VueApexCharts,
 	},
 	props: ['playerScore', 'playerName', 'levelFilter', 'rivalScore', 'rivalName'],
 	data: () => ({
+		isShow: false,
 		search: '',
 		defaultHeaders: [
 			{ text: 'title', value: 'title' },
@@ -39,6 +48,11 @@ export default {
 		],
 		// TODO: 別のファイルに切り出す
 		grades: ['A', 'A+', 'AA', 'AA+', 'AAA', 'AAA+', 'S'],
+		chartOptions: {
+			chart: {
+				type: 'donut',
+			},
+		}
 	}),
 	computed: {
 		filteredItems: function () {
@@ -77,6 +91,14 @@ export default {
 			const hoge = _(this.filteredItems).groupBy(a => a.grade).mapValues(a => a.length).value()
 			const result = this.grades.map(t => { return hoge[t] || 0})		
 			return result
+		},
+		chartOption: function() {
+			return {
+				chart: {
+					width: 180,
+					type: 'donut',
+				},
+			}
 		},
 	},
 	methods: {

@@ -58,7 +58,7 @@ import ScoreTable from './ScoreTable.vue'
 import Filter from './Filter.vue'
 import json from '../../assets/score.json'
 import rivalJson from '../../assets/rival_score.json'
-//import ApexCharts from 'apexcharts'
+import Score from '../hoge'
 
 export default {
   name: 'Home',
@@ -73,7 +73,7 @@ export default {
     playerData1: {},
     playerData2: {},
     data: [],
-    isProduction: true,
+    isProduction: false,
 		levelFilter: [],
   }),
 
@@ -106,6 +106,7 @@ export default {
           })
         }
       } else {
+        console.log((new Score(this.playerData1)).getFormatedScore())
         this.playerData1 = this.formatScore(json)
         this.playerData2 = this.formatScore(rivalJson)
         this.data = this.setRivelScore(this.playerData1, this.playerData2)
