@@ -1,5 +1,5 @@
 <template>
-	<v-container>
+  <v-container>
     <v-row>
       <v-checkbox
         v-for="box in lvCheckboxes"
@@ -9,14 +9,14 @@
         :value="box.value"
       ></v-checkbox>
     </v-row>
-	</v-container>
+  </v-container>
 </template>
 <style scoped lang="scss">
 </style>
 
 <script>
 export default {
-	data: () => ({
+  data: () => ({
     selected: [],
   }),
   computed: {

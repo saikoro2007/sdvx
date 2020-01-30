@@ -88,6 +88,7 @@ export default {
       this.playerData1 = this.formatScore(await this.callApi(this.playerName1))
     }
   },
+
   methods: {
     async action () {
       if (this.isProduction) {

@@ -2,8 +2,8 @@
   <v-app>
     <div>
       <v-toolbar>
-        <v-toolbar-title>Title</v-toolbar-title>
-  
+        <v-toolbar-title>SDVX V スコア比較ツール（β）</v-toolbar-title>
+
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
@@ -13,7 +13,7 @@
         </v-toolbar-items>
       </v-toolbar>
     </div>
-    
+
     <router-view></router-view>
   </v-app>
 </template>
