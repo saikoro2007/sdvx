@@ -40,7 +40,8 @@
       "eslint:recommended"
     ],
     "rules": {
-      "no-console": "off"
+      "no-console": "off",
+      "indent": ["error", 2]
     },
     "parserOptions": {
       "parser": "babel-eslint"

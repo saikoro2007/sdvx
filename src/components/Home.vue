@@ -73,7 +73,7 @@ export default {
     playerData2: {},
     data: [],
     isProduction: true,
-		levelFilter: [],
+    levelFilter: [],
   }),
 
   computed: {
@@ -124,15 +124,15 @@ export default {
     // {id_(難易度): {スコア等}....} の形に変換する
     // 絶対もっとどうにかなるけどJSむずかしい
     formatScore: scoreData => {
-			return _(scoreData).map(item => {
-				const title = item.title
-				const id = item.id
-				return _(item).omit(['title', 'id']).map((score, difficulty) => {
+      return _(scoreData).map(item => {
+        const title = item.title
+        const id = item.id
+        return _(item).omit(['title', 'id']).map((score, difficulty) => {
           return {...score, id: `${id}_${difficulty}`, title: title, musicId: id, difficulty: difficulty}
-				}).value()
+        }).value()
       }).flatten().mapKeys(v => v.id).value()
     },
-		updateFilter (filter) {
+    updateFilter (filter) {
       this.levelFilter = filter
     },
     // ライバルのスコアと比較して譜面ごとの差分要素を追加する
