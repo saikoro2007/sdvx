@@ -11,12 +11,14 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
+      meta: { title: 'SDVX V スコア比較ツール（β）'}
     },
     {
       path: '/:name',
       name: 'player',
-      component: Home
+      component: Home,
+      meta: { title: 'SDVX V スコア比較ツール（β）'}
     }
   ]
 })
