@@ -113,7 +113,7 @@ export default {
     },
     async callApi (playerName) {
       let response = {}
-      await axios.get(`https://pyzzle.herokuapp.com/api/sdvx/${playerName}`)
+      await axios.get(`https://pyzzle.du.r.appspot.com//api/sdvx/${playerName}`)
         .then(res => {
           if (res.data.profile) {
             response = res.data.profile.tracks
